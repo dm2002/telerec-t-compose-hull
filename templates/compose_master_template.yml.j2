@@ -4,6 +4,13 @@
 #   (docker compose ignores fields that start with `x-`. So we can use them to
 #    define reusable fragments with `&anchors`. See:
 #    https://docs.docker.com/compose/compose-file/11-extension/ )
+{% if service_cfg.traefik == true %}
+{%   if service_cfg.domains is defined %}
+{%     set host_rule = service_cfg.domains | map('regex_replace', '^(.*)$', 'Host(`\\1`)') | join(' || ') %}
+{%   else %}
+{%     set host_rule = 'Host(`' + service_cfg.domain + '`)' %}
+{%   endif %}
+{% endif %}
 x-labels: &base_labels
 {% if service_cfg.traefik == true %}
       traefik.enable: "true"
@@ -11,9 +18,9 @@ x-labels: &base_labels
       traefik.http.services.{{ service_cfg.name }}.loadbalancer.server.port: "{{ service_cfg.port }}"
       traefik.http.routers.{{ service_cfg.name }}_web.EntryPoints: "{{ service_cfg.router_entry_point }}"
 {% if service_cfg.url_path_prefix is defined and service_cfg.url_path_prefix|length %}
-      traefik.http.routers.{{ service_cfg.name }}_web.rule: "Host(`{{ service_cfg.domain }}`) && PathPrefix(`{{ service_cfg.url_path_prefix }}`)"
+      traefik.http.routers.{{ service_cfg.name }}_web.rule: "({{ host_rule }}) && PathPrefix(`{{ service_cfg.url_path_prefix }}`)"
 {% else %}
-      traefik.http.routers.{{ service_cfg.name }}_web.rule: "Host(`{{ service_cfg.domain }}`)"
+      traefik.http.routers.{{ service_cfg.name }}_web.rule: "{{ host_rule }}"
 {% endif %}
 {% if service_cfg.external is not defined or service_cfg.external == false %}
       traefik.http.routers.{{ service_cfg.name }}_web.middlewares: "internal-ips-only@file"
