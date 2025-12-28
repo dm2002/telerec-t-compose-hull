@@ -16,6 +16,7 @@
 - name: Pull container images
   community.docker.docker_compose_v2_pull:
     project_src: "{{ service_cfg.directory }}"
+  when: not service_cfg.local_docker_build
 
 - name: Create containers
   ansible.builtin.command:

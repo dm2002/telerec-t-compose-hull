@@ -13,3 +13,4 @@ service_base_defaults:
   router_entry_point: "web-secure"
   subdirs: []
   skip_network_definition: false
+  local_docker_build: false
