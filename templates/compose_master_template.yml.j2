@@ -39,10 +39,17 @@ x-labels: &base_labels
 # Reusable default networks configuration to ensure container is part of both
 # the traefik network and the default network of this compose file
 x-networks: &base_networks
+{% if service_cfg.disable_default_network is not defined or service_cfg.disable_default_network == false %}
   default:
+{% endif %}
   traefik_net:
     aliases:
       - {{ service_cfg.name }}
+{% if service_cfg.use_backend_network is defined and service_cfg.use_backend_network == true %}
+  backend_net:
+    aliases:
+      - {{ service_cfg.name }}
+{% endif %}
 
 # The main Docker Compose file
 {{ lookup('template', 'docker-compose.yml.j2') }}
@@ -53,4 +60,9 @@ networks:
   traefik_net:
     external: true
     name: traefik_default
+{% if service_cfg.use_backend_network is defined and service_cfg.use_backend_network == true %}
+  backend_net:
+    external: true
+    name: backend_shared
+{% endif %}
 {% endif %}
