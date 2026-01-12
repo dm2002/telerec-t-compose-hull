@@ -42,27 +42,59 @@ x-networks: &base_networks
 {% if service_cfg.disable_default_network is not defined or service_cfg.disable_default_network == false %}
   default:
 {% endif %}
+{% if service_cfg.disable_traefik_network is not defined or service_cfg.disable_traefik_network == false %}
   traefik_net:
     aliases:
       - {{ service_cfg.name }}
+{% endif %}
 {% if service_cfg.use_backend_network is defined and service_cfg.use_backend_network == true %}
   backend_net:
     aliases:
       - {{ service_cfg.name }}
+{% endif %}
+{% if service_cfg.isolated_networks is defined %}
+{%   for network in service_cfg.isolated_networks %}
+  {{ network }}:
+    aliases:
+      - {{ service_cfg.name }}
+{%   endfor %}
+{% endif %}
+{% if service_cfg.external_networks is defined %}
+{%   for network in service_cfg.external_networks %}
+  {{ network }}:
+    aliases:
+      - {{ service_cfg.name }}
+{%   endfor %}
 {% endif %}
 
 # The main Docker Compose file
 {{ lookup('template', 'docker-compose.yml.j2') }}
 
 {% if service_cfg.skip_network_definition is not defined or service_cfg.skip_network_definition == false %}
-# Access the traefik-network
+# Network definitions
 networks:
+{% if service_cfg.disable_traefik_network is not defined or service_cfg.disable_traefik_network == false %}
   traefik_net:
     external: true
     name: traefik_default
+{% endif %}
 {% if service_cfg.use_backend_network is defined and service_cfg.use_backend_network == true %}
   backend_net:
     external: true
     name: backend_shared
+{% endif %}
+{% if service_cfg.isolated_networks is defined %}
+{%   for network in service_cfg.isolated_networks %}
+  {{ network }}:
+    internal: true
+    driver: bridge
+{%   endfor %}
+{% endif %}
+{% if service_cfg.external_networks is defined %}
+{%   for network in service_cfg.external_networks %}
+  {{ network }}:
+    external: true
+    name: {{ network }}
+{%   endfor %}
 {% endif %}
 {% endif %}
