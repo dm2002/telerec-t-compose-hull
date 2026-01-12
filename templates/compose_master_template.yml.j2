@@ -42,7 +42,7 @@ x-networks: &base_networks
 {% if service_cfg.disable_default_network is not defined or service_cfg.disable_default_network == false %}
   default:
 {% endif %}
-{% if service_cfg.disable_traefik_network is not defined or service_cfg.disable_traefik_network == false %}
+{% if service_cfg.traefik is not defined or service_cfg.traefik == true %}
   traefik_net:
     aliases:
       - {{ service_cfg.name }}
@@ -73,7 +73,7 @@ x-networks: &base_networks
 {% if service_cfg.skip_network_definition is not defined or service_cfg.skip_network_definition == false %}
 # Network definitions
 networks:
-{% if service_cfg.disable_traefik_network is not defined or service_cfg.disable_traefik_network == false %}
+{% if service_cfg.traefik is not defined or service_cfg.traefik == true %}
   traefik_net:
     external: true
     name: traefik_default
