@@ -42,9 +42,11 @@ x-networks: &base_networks
 {% if service_cfg.disable_default_network is not defined or service_cfg.disable_default_network == false %}
   default:
 {% endif %}
+{% if service_cfg.traefik == true %}
   traefik_net:
     aliases:
       - {{ service_cfg.name }}
+{% endif %}
 {% if service_cfg.use_backend_network is defined and service_cfg.use_backend_network == true %}
   backend_net:
     aliases:
@@ -55,14 +57,18 @@ x-networks: &base_networks
 {{ lookup('template', 'docker-compose.yml.j2') }}
 
 {% if service_cfg.skip_network_definition is not defined or service_cfg.skip_network_definition == false %}
-# Access the traefik-network
+{%   if service_cfg.traefik == true or (service_cfg.use_backend_network is defined and service_cfg.use_backend_network == true) %}
+# External network definitions
 networks:
+{%     if service_cfg.traefik == true %}
   traefik_net:
     external: true
     name: traefik_default
-{% if service_cfg.use_backend_network is defined and service_cfg.use_backend_network == true %}
+{%     endif %}
+{%     if service_cfg.use_backend_network is defined and service_cfg.use_backend_network == true %}
   backend_net:
     external: true
     name: backend_shared
-{% endif %}
+{%     endif %}
+{%   endif %}
 {% endif %}
