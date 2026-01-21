@@ -14,3 +14,4 @@ service_base_defaults:
   subdirs: []
   skip_network_definition: false
   local_docker_build: false
+  no_new_privileges: true

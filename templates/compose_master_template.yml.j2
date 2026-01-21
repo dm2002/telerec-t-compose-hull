@@ -53,6 +53,15 @@ x-networks: &base_networks
       - {{ service_cfg.name }}
 {% endif %}
 
+# Reusable security options for container hardening
+# Default: no-new-privileges enabled unless explicitly set to false
+x-security-opt: &base_security_opt
+{% if service_cfg.no_new_privileges == false %}
+  []
+{% else %}
+  - no-new-privileges:true
+{% endif %}
+
 # The main Docker Compose file
 {{ lookup('template', 'docker-compose.yml.j2') }}
 
