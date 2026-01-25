@@ -6,5 +6,6 @@
     owner: "{{ service_cfg.owner }}"
     group: docker
     mode: "775"
+    recurse: yes
   with_items: "{{ [''] + service_cfg.subdirs }}"
   tags: [ always ]

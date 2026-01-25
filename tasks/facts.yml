@@ -5,6 +5,12 @@
     service_cfg: "{{ service_base_defaults | ansible.builtin.combine(service_defaults, all_service_defaults, service_cfg, recursive=true) }}"
   tags: [ always ]
 
+- name: "Override owner with dedicated user if enabled"
+  ansible.builtin.set_fact:
+    service_cfg: "{{ service_cfg | combine({'owner': service_cfg.dedicated_user.name}) }}"
+  when: service_cfg.dedicated_user.enabled | default(false)
+  tags: [ always ]
+
 - name: Set compose parameters according to "restarted" tag
   ansible.builtin.set_fact:
     docker_compose_params:

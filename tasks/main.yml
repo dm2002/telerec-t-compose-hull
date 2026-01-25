@@ -4,6 +4,9 @@
 - include_tasks: facts.yml
   tags: [ always ]
 
+- include_tasks: create_dedicated_user.yml
+  tags: [ always ]
+
 - include_tasks: create_directories.yml
   tags: [ always ]
 

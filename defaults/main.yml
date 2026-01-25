@@ -15,3 +15,13 @@ service_base_defaults:
   skip_network_definition: false
   local_docker_build: false
   no_new_privileges: true
+  # Dedicated system user configuration
+  # If set, creates a dedicated system user and sets ownership of service directories
+  dedicated_user:
+    enabled: false
+    name: ""
+    uid: null
+    # Add user to docker group (needed for accessing Docker socket)
+    add_to_docker_group: false
+    # Subdirectories that should be owned by the dedicated user (defaults to all subdirs)
+    owned_subdirs: []

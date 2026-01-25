@@ -1,0 +1,25 @@
+---
+- name: Create dedicated system user for {{ service_cfg.name }}
+  user:
+    name: "{{ service_cfg.dedicated_user.name }}"
+    uid: "{{ service_cfg.dedicated_user.uid }}"
+    system: yes
+    create_home: no
+    shell: /usr/sbin/nologin
+    state: present
+  when:
+    - service_cfg.dedicated_user.enabled | default(false)
+    - service_cfg.dedicated_user.name is defined
+    - service_cfg.dedicated_user.uid is defined
+  tags: [ always ]
+
+- name: Add dedicated user to docker group
+  user:
+    name: "{{ service_cfg.dedicated_user.name }}"
+    groups: docker
+    append: yes
+  when:
+    - service_cfg.dedicated_user.enabled | default(false)
+    - service_cfg.dedicated_user.name is defined
+    - service_cfg.dedicated_user.add_to_docker_group | default(false)
+  tags: [ always ]
